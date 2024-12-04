@@ -6,6 +6,8 @@ export function renderField(obj) {
             return renderNumber(obj)
         case "email":
             return renderEmail(obj)
+        case "select":
+            return renderSelect(obj)
         case "default":
             return renderDefault(obj)
     }
@@ -103,6 +105,28 @@ function renderEmail(obj) {
     })
 }
 
+function renderSelect(obj) {
+    return renderLabel(obj, (obj) => {
+        let field = document.createElement("select")
+        field.id = obj.id
+        
+        obj.options.forEach(element => {
+            let option = document.createElement("option")
+            option.value = element.value
+            option.innerText = element.title
+
+            field.appendChild(option)
+        });
+
+        // field.addEventListener("input", (event) => {
+        //     obj.state[obj.id] = field.value
+        // })
+        field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
+
+        return field
+    })
+}
+
 function renderDefault(obj) {
     let field = document.createElement("div")
     field.id = obj.id
@@ -112,7 +136,7 @@ function renderDefault(obj) {
 
 function renderLabel(obj, createFunc) {
     let container
-    if (obj.label != null) {
+    if (obj.label) {
         container = document.createElement("div")
 
         let label = document.createElement("p")
@@ -134,8 +158,8 @@ function renderLabel(obj, createFunc) {
 
     let field = createFunc(obj, container)
 
-    if (container != null) {
-        if (field != null) {
+    if (container) {
+        if (field) {
             container.appendChild(field)
         }
 
@@ -164,8 +188,8 @@ export function renderForm(form) {
     }
 
     let controls = form.controls
-    if (controls != null) {
-        if (controls.onSave != null) {
+    if (controls) {
+        if (controls.onSave) {
             let but = document.createElement("button")
             but.id = "form_onsave"
             but.innerText = "Save"
@@ -173,11 +197,16 @@ export function renderForm(form) {
             _form.appendChild(but)
         }
 
-        if (controls.onClear != null) {
+        if (controls.onClear) {
             let but = document.createElement("button")
             but.id = "form_onclear"
             but.innerText = "Clear"
-            but.onclick = () => { controls.onClear(formState) }
+            but.onclick = () => {
+                controls.onClear(formState)
+                formState = {}
+
+                UpdateFormStateOutput(formState)
+            }
             _form.appendChild(but)
         }
     }
@@ -190,8 +219,12 @@ function OnValueUpdated(obj, field) {
     obj.state[obj.id] = value
     field.value = value
 
+    UpdateFormStateOutput(obj.state)
+}
+
+function UpdateFormStateOutput(state) {
     let output = document.getElementById("form_state")
-    if (output != null) {
-        output.innerText = "Form state: " + JSON.stringify(obj.state)
+    if (output) {
+        output.innerText = "Form state: " + JSON.stringify(state)
     }
 }

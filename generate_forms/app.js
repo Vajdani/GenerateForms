@@ -78,6 +78,25 @@ let form = renderForm({
             id: "email1",
             type: "email",
             label: "ez itt most az első ímél",
+        },
+        {
+            id: "select1",
+            type: "select",
+            label: "ez itt most az első select",
+            options : [
+                {
+                    value: "balls",
+                    title: "Balls"
+                },
+                {
+                    value: "balls2",
+                    title: "Balls2"
+                },
+                {
+                    value: "balls3",
+                    title: "Balls3"
+                }
+            ]
         }
     ]
 })
