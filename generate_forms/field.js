@@ -17,9 +17,10 @@ function renderText(obj) {
         field.id = obj.id
         field.type = "text"
 
-        field.addEventListener("input", (event) => {
-            obj.state[obj.id] = field.value
-        })
+        // field.addEventListener("input", (event) => {
+        //     obj.state[obj.id] = field.value
+        // })
+        field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
     })
@@ -31,17 +32,18 @@ function renderNumber(obj) {
         field.id = obj.id
         field.type = "number"
 
-        field.addEventListener("input", (event) => {
-            let value = field.value
+        // field.addEventListener("input", (event) => {
+        //     let value = field.value
 
-            // if (field.value == "" && obj.state[obj.id].length > 1) {
-            //     field.value = obj.state[obj.id]
-            //     return
-            // }
+        //     // if (field.value == "" && obj.state[obj.id].length > 1) {
+        //     //     field.value = obj.state[obj.id]
+        //     //     return
+        //     // }
 
-            obj.state[obj.id] = value
-            field.value = value
-        })
+        //     obj.state[obj.id] = value
+        //     field.value = value
+        // })
+        field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
     })
@@ -60,8 +62,14 @@ function renderEmail(obj) {
         name.type = "text"
         name.style.display = "inline"
 
+        // name.addEventListener("input", (event) => {
+        //     obj.state[obj.id] = name.value
+        // })
         name.addEventListener("input", (event) => {
-            obj.state[obj.id] = name.value
+            OnValueUpdated({
+                id: obj.id + "_name",
+                state: obj.state,
+            }, name)
         })
 
         _container.appendChild(name)
@@ -77,8 +85,14 @@ function renderEmail(obj) {
         domain.type = "text"
         domain.style.display = "inline"
 
+        // domain.addEventListener("input", (event) => {
+        //     obj.state[obj.id] = domain.value
+        // })
         domain.addEventListener("input", (event) => {
-            obj.state[obj.id] = domain.value
+            OnValueUpdated({
+                id: obj.id + "_domain",
+                state: obj.state,
+            }, domain)
         })
 
         _container.appendChild(domain)
@@ -138,7 +152,7 @@ export function renderForm(form) {
     if (form.showState) {
         let label = document.createElement("p")
         label.id = "form_state"
-        label.innerText = "Form state: "
+        label.innerText = "Form state: " + JSON.stringify(formState)
         _form.appendChild(label)
     }
 
@@ -147,11 +161,37 @@ export function renderForm(form) {
         config.labelOnTop = form.labelOnTop
         config.state = formState
         _form.appendChild(renderField(config))
-        
-        // _form.getElementById(config.id).addEventListener("input", (event) => {
-        //     document.getElementById("form_state").innerText = JSON.stringify(obj.state)
-        // })
+    }
+
+    let controls = form.controls
+    if (controls != null) {
+        if (controls.onSave != null) {
+            let but = document.createElement("button")
+            but.id = "form_onsave"
+            but.innerText = "Save"
+            but.onclick = () => { controls.onSave(formState) }
+            _form.appendChild(but)
+        }
+
+        if (controls.onClear != null) {
+            let but = document.createElement("button")
+            but.id = "form_onclear"
+            but.innerText = "Clear"
+            but.onclick = () => { controls.onClear(formState) }
+            _form.appendChild(but)
+        }
     }
 
     return _form
+}
+
+function OnValueUpdated(obj, field) {
+    let value = field.value
+    obj.state[obj.id] = value
+    field.value = value
+
+    let output = document.getElementById("form_state")
+    if (output != null) {
+        output.innerText = "Form state: " + JSON.stringify(obj.state)
+    }
 }

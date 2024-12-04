@@ -48,6 +48,16 @@ let globalState = {}
 let form = renderForm({
     showState: true,
     labelOnTop: true,
+    controls: {
+        onSave: (state) => {
+            console.log("Implement save state: " + JSON.stringify(state))
+        },
+        onClear: (state) => {
+            for (const [key, value] of Object.entries(state)) {
+                document.getElementById(key).value = ""
+            }
+        }
+    },
     fields: [
         {
             id: "text1",
