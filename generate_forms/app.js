@@ -54,7 +54,17 @@ let form = renderForm({
         },
         onClear: (state) => {
             for (const [key, value] of Object.entries(state)) {
-                document.getElementById(key).value = ""
+                let node = document.getElementById(key)
+                console.log(node.tagName)
+                if (node.tagName == "SELECT") {
+                    node.selectedIndex = 0
+                }
+                else if(node.tagName == "NUMBER") {
+                    node.value = 0
+                }
+                else {
+                    node.value = ""
+                }
             }
         }
     },

@@ -203,7 +203,10 @@ export function renderForm(form) {
             but.innerText = "Clear"
             but.onclick = () => {
                 controls.onClear(formState)
-                formState = {}
+
+                for (const [key, value] of Object.entries(formState)) {
+                    delete formState[key]
+                }
 
                 UpdateFormStateOutput(formState)
             }
