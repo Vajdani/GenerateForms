@@ -19,9 +19,6 @@ function renderText(obj) {
         field.id = obj.id
         field.type = "text"
 
-        // field.addEventListener("input", (event) => {
-        //     obj.state[obj.id] = field.value
-        // })
         field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
@@ -34,17 +31,6 @@ function renderNumber(obj) {
         field.id = obj.id
         field.type = "number"
 
-        // field.addEventListener("input", (event) => {
-        //     let value = field.value
-
-        //     // if (field.value == "" && obj.state[obj.id].length > 1) {
-        //     //     field.value = obj.state[obj.id]
-        //     //     return
-        //     // }
-
-        //     obj.state[obj.id] = value
-        //     field.value = value
-        // })
         field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
@@ -64,9 +50,6 @@ function renderEmail(obj) {
         name.type = "text"
         name.style.display = "inline"
 
-        // name.addEventListener("input", (event) => {
-        //     obj.state[obj.id] = name.value
-        // })
         name.addEventListener("input", (event) => {
             OnValueUpdated({
                 id: obj.id + "_name",
@@ -87,9 +70,6 @@ function renderEmail(obj) {
         domain.type = "text"
         domain.style.display = "inline"
 
-        // domain.addEventListener("input", (event) => {
-        //     obj.state[obj.id] = domain.value
-        // })
         domain.addEventListener("input", (event) => {
             OnValueUpdated({
                 id: obj.id + "_domain",
@@ -118,9 +98,6 @@ function renderSelect(obj) {
             field.appendChild(option)
         });
 
-        // field.addEventListener("input", (event) => {
-        //     obj.state[obj.id] = field.value
-        // })
         field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
@@ -128,10 +105,12 @@ function renderSelect(obj) {
 }
 
 function renderDefault(obj) {
-    let field = document.createElement("div")
-    field.id = obj.id
+    return renderLabel(obj, (obj) => {
+        let field = document.createElement("div")
+        field.id = obj.id
 
-    return field
+        return field
+    })
 }
 
 function renderLabel(obj, createFunc) {
