@@ -45,21 +45,28 @@ let globalState = {}
 // app.appendChild(email1)
 
 
-let form = renderForm({
+let form = await renderForm({
     showState: true,
     labelOnTop: true,
     controls: {
         onSave: (state) => {
             console.log("Implement save state: " + JSON.stringify(state))
+
+            fetch("http://localhost:8001/forms/user_data/", {
+                method: "POST",
+                body: JSON.stringify(state),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            });
         },
         onClear: (state) => {
             for (const [key, value] of Object.entries(state)) {
                 let node = document.getElementById(key)
-                console.log(node.tagName)
                 if (node.tagName == "SELECT") {
                     node.selectedIndex = 0
                 }
-                else if(node.tagName == "NUMBER") {
+                else if (node.tagName == "NUMBER") {
                     node.value = 0
                 }
                 else {
@@ -93,7 +100,7 @@ let form = renderForm({
             id: "select1",
             type: "select",
             label: "ez itt most az első select",
-            options : [
+            options: [
                 {
                     value: "balls",
                     title: "Balls"

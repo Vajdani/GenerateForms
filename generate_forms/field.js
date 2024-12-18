@@ -19,6 +19,11 @@ function renderText(obj) {
         field.id = obj.id
         field.type = "text"
 
+        let saved = obj.state[obj.id]
+        if (saved != null) {
+            field.value = saved
+        }
+
         field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
         return field
@@ -30,6 +35,11 @@ function renderNumber(obj) {
         let field = document.createElement("input")
         field.id = obj.id
         field.type = "number"
+
+        let saved = obj.state[obj.id]
+        if (saved != null) {
+            field.value = saved
+        }
 
         field.addEventListener("input", (event) => { OnValueUpdated(obj, field) })
 
@@ -49,6 +59,11 @@ function renderEmail(obj) {
         name.id = obj.id + "_name"
         name.type = "text"
         name.style.display = "inline"
+
+        let name_saved = obj.state[obj.id + "_name"]
+        if (name_saved != null) {
+            name.value = name_saved
+        }
 
         name.addEventListener("input", (event) => {
             OnValueUpdated({
@@ -70,6 +85,11 @@ function renderEmail(obj) {
         domain.type = "text"
         domain.style.display = "inline"
 
+        let domain_saved = obj.state[obj.id + "_domain"]
+        if (domain_saved != null) {
+            domain.value = domain_saved
+        }
+
         domain.addEventListener("input", (event) => {
             OnValueUpdated({
                 id: obj.id + "_domain",
@@ -89,11 +109,12 @@ function renderSelect(obj) {
     return renderLabel(obj, (obj) => {
         let field = document.createElement("select")
         field.id = obj.id
-        
+
         obj.options.forEach(element => {
             let option = document.createElement("option")
             option.value = element.value
             option.innerText = element.title
+            option.selected = obj.state[obj.id] == element.value
 
             field.appendChild(option)
         });
@@ -148,9 +169,28 @@ function renderLabel(obj, createFunc) {
     return field
 }
 
-export function renderForm(form) {
+export async function renderForm(form) {
     let _form = document.createElement("div")
     var formState = {}
+
+    await fetch("http://localhost:8001/forms/", {
+        method: "GET",
+        headers: {
+            "Access-Control-Allow-Origin" : "*"
+        }
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        return response.json();
+    }).then((data) => {
+        for (const [key, value] of Object.entries(data[0].data)) {
+            formState[key] = value
+        }
+    }).catch((error) => {
+        console.log(`Could not fetch verse: ${error}`);
+    });
 
     if (form.showState) {
         let label = document.createElement("p")
