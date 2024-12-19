@@ -169,11 +169,13 @@ function renderLabel(obj, createFunc) {
     return field
 }
 
+var formCount = 0
+var formFieldsToFormLabel = {}
 export async function renderForm(form) {
     let _form = document.createElement("div")
     var formState = {}
 
-    await fetch("http://localhost:8001/forms/", {
+    await fetch("http://localhost:8001/forms/" + form.savePath, {
         method: "GET",
         headers: {
             "Access-Control-Allow-Origin" : "*"
@@ -185,7 +187,7 @@ export async function renderForm(form) {
 
         return response.json();
     }).then((data) => {
-        for (const [key, value] of Object.entries(data[0].data)) {
+        for (const [key, value] of Object.entries(data)) {
             formState[key] = value
         }
     }).catch((error) => {
@@ -194,7 +196,7 @@ export async function renderForm(form) {
 
     if (form.showState) {
         let label = document.createElement("p")
-        label.id = "form_state"
+        label.id = "form_state_" + formCount
         label.innerText = "Form state: " + JSON.stringify(formState)
         _form.appendChild(label)
     }
@@ -204,6 +206,8 @@ export async function renderForm(form) {
         config.labelOnTop = form.labelOnTop
         config.state = formState
         _form.appendChild(renderField(config))
+
+        formFieldsToFormLabel[config.id] = "form_state_" + formCount
     }
 
     let controls = form.controls
@@ -233,6 +237,8 @@ export async function renderForm(form) {
         }
     }
 
+    formCount++
+
     return _form
 }
 
@@ -245,7 +251,7 @@ function OnValueUpdated(obj, field) {
 }
 
 function UpdateFormStateOutput(state) {
-    let output = document.getElementById("form_state")
+    let output = document.getElementById(formFieldsToFormLabel[Object.entries(state)[0][0]])
     if (output) {
         output.innerText = "Form state: " + JSON.stringify(state)
     }

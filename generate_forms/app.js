@@ -1,7 +1,7 @@
 import { renderField, renderForm } from "./field.js"
 
 const app = document.getElementById("app")
-let globalState = {}
+// let globalState = {}
 
 // let text1 = renderField({
 //     id: "text1",
@@ -48,6 +48,7 @@ let globalState = {}
 let form = await renderForm({
     showState: true,
     labelOnTop: true,
+    savePath: "user_data",
     controls: {
         onSave: (state) => {
             console.log("Implement save state: " + JSON.stringify(state))
@@ -118,3 +119,72 @@ let form = await renderForm({
     ]
 })
 app.appendChild(form)
+
+let form2 = await renderForm({
+    showState: true,
+    labelOnTop: true,
+    savePath: "app_config",
+    controls: {
+        onSave: (state) => {
+            console.log("Implement save state: " + JSON.stringify(state))
+
+            fetch("http://localhost:8001/forms/app_config/", {
+                method: "POST",
+                body: JSON.stringify(state),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            });
+        },
+        onClear: (state) => {
+            for (const [key, value] of Object.entries(state)) {
+                let node = document.getElementById(key)
+                if (node.tagName == "SELECT") {
+                    node.selectedIndex = 0
+                }
+                else if (node.tagName == "NUMBER") {
+                    node.value = 0
+                }
+                else {
+                    node.value = ""
+                }
+            }
+        }
+    },
+    fields: [
+        {
+            id: "appName",
+            type: "text",
+            label: "Alkalmazás neve:",
+        },
+        {
+            id: "appVersion",
+            type: "text",
+            label: "Alkalmazás verzió:",
+        },
+        {
+            id: "appPlatform",
+            type: "select",
+            label: "Alkalmazás platformja:",
+            options: [
+                {
+                    value: "windows",
+                    title: "Windows"
+                },
+                {
+                    value: "linux",
+                    title: "Linux"
+                },
+                {
+                    value: "ios",
+                    title: "IOS"
+                },
+                {
+                    value: "android",
+                    title: "Android"
+                }
+            ]
+        }
+    ]
+})
+app.appendChild(form2)
